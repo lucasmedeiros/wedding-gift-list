@@ -41,7 +41,8 @@ public class GiftsService(WeddingGiftListContext context, IMemoryCache memoryCac
             Description = g.Description,
             TakenByGuestName = g.TakenByGuestName,
             TakenAt = g.TakenAt,
-            IsTaken = g.IsTaken
+            IsTaken = g.IsTaken,
+            Version = g.Version
         }).ToList();
         return giftResponses;
     }
@@ -62,7 +63,8 @@ public class GiftsService(WeddingGiftListContext context, IMemoryCache memoryCac
             Description = gift.Description,
             TakenByGuestName = gift.TakenByGuestName,
             TakenAt = gift.TakenAt,
-            IsTaken = gift.IsTaken
+            IsTaken = gift.IsTaken,
+            Version = gift.Version
         };
     }
 
@@ -72,7 +74,7 @@ public class GiftsService(WeddingGiftListContext context, IMemoryCache memoryCac
         {
             Name = request.Name,
             Description = request.Description,
-            Version = 1
+            Version = 0
         };
 
         context.Gifts.Add(gift);
@@ -138,7 +140,8 @@ public class GiftsService(WeddingGiftListContext context, IMemoryCache memoryCac
             Description = gift.Description,
             TakenByGuestName = gift.TakenByGuestName,
             TakenAt = gift.TakenAt,
-            IsTaken = gift.IsTaken
+            IsTaken = gift.IsTaken,
+            Version = gift.Version
         };
     }
 
@@ -170,7 +173,8 @@ public class GiftsService(WeddingGiftListContext context, IMemoryCache memoryCac
             Description = gift.Description,
             TakenByGuestName = gift.TakenByGuestName,
             TakenAt = gift.TakenAt,
-            IsTaken = gift.IsTaken
+            IsTaken = gift.IsTaken,
+            Version = gift.Version
         };
     }
     
