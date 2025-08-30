@@ -8,17 +8,9 @@ namespace WeddingGiftList.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class GiftsController : ControllerBase
+public class GiftsController(WeddingGiftListContext context, ILogger<GiftsController> logger)
+    : ControllerBase
 {
-    private readonly WeddingGiftListContext _context;
-    private readonly ILogger<GiftsController> _logger;
-
-    public GiftsController(WeddingGiftListContext context, ILogger<GiftsController> logger)
-    {
-        _context = context;
-        _logger = logger;
-    }
-
     /// <summary>
     /// Get all gifts with their current status
     /// </summary>
@@ -27,25 +19,67 @@ public class GiftsController : ControllerBase
     {
         try
         {
-            var gifts = await _context.Gifts.ToListAsync();
+            var gifts = await context.Gifts.ToListAsync();
             var giftResponses = gifts.Select(g => new GiftResponse
             {
                 Id = g.Id,
                 Name = g.Name,
                 Description = g.Description,
-                ImageUrl = g.ImageUrl,
                 TakenByGuestName = g.TakenByGuestName,
                 TakenAt = g.TakenAt,
                 IsTaken = g.IsTaken,
-                RowVersion = g.RowVersion
+                Version = g.Version
             });
 
             return Ok(giftResponses);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving gifts");
+            logger.LogError(ex, "Error retrieving gifts");
             return StatusCode(500, "An error occurred while retrieving gifts");
+        }
+    }
+
+    /// <summary>
+    /// Create a new gift
+    /// </summary>
+    [HttpPost]
+    public async Task<ActionResult<GiftResponse>> CreateGift(CreateGiftRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var gift = new Gift
+            {
+                Name = request.Name,
+                Description = request.Description,
+                Version = 1
+            };
+
+            context.Gifts.Add(gift);
+            await context.SaveChangesAsync();
+
+            var response = new GiftResponse
+            {
+                Id = gift.Id,
+                Name = gift.Name,
+                Description = gift.Description,
+                TakenByGuestName = gift.TakenByGuestName,
+                TakenAt = gift.TakenAt,
+                IsTaken = gift.IsTaken,
+                Version = gift.Version
+            };
+
+            return CreatedAtAction(nameof(GetGifts), new { id = gift.Id }, response);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error creating gift");
+            return StatusCode(500, "An error occurred while creating the gift");
         }
     }
 
@@ -62,7 +96,7 @@ public class GiftsController : ControllerBase
 
         try
         {
-            var gift = await _context.Gifts.FindAsync(id);
+            var gift = await context.Gifts.FindAsync(id);
             if (gift == null)
             {
                 return NotFound($"Gift with ID {id} not found");
@@ -73,22 +107,28 @@ public class GiftsController : ControllerBase
                 return Conflict(new { message = "Gift has already been taken", takenBy = gift.TakenByGuestName });
             }
 
+            // Check version for optimistic concurrency (if provided)
+            if (request.Version.HasValue && gift.Version != request.Version.Value)
+            {
+                return Conflict(new { message = "The gift was modified by another user. Please refresh and try again." });
+            }
+
             // Update the gift
             gift.TakenByGuestName = request.GuestName;
             gift.TakenAt = DateTime.UtcNow;
+            gift.Version++; // Increment version for concurrency control
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             var response = new GiftResponse
             {
                 Id = gift.Id,
                 Name = gift.Name,
                 Description = gift.Description,
-                ImageUrl = gift.ImageUrl,
                 TakenByGuestName = gift.TakenByGuestName,
                 TakenAt = gift.TakenAt,
                 IsTaken = gift.IsTaken,
-                RowVersion = gift.RowVersion
+                Version = gift.Version
             };
 
             return Ok(response);
@@ -99,7 +139,7 @@ public class GiftsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error taking gift {GiftId}", id);
+            logger.LogError(ex, "Error taking gift {GiftId}", id);
             return StatusCode(500, "An error occurred while taking the gift");
         }
     }
@@ -112,7 +152,7 @@ public class GiftsController : ControllerBase
     {
         try
         {
-            var gift = await _context.Gifts.FindAsync(id);
+            var gift = await context.Gifts.FindAsync(id);
             if (gift == null)
             {
                 return NotFound($"Gift with ID {id} not found");
@@ -126,19 +166,19 @@ public class GiftsController : ControllerBase
             // Release the gift
             gift.TakenByGuestName = null;
             gift.TakenAt = null;
+            gift.Version++; // Increment version for concurrency control
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             var response = new GiftResponse
             {
                 Id = gift.Id,
                 Name = gift.Name,
                 Description = gift.Description,
-                ImageUrl = gift.ImageUrl,
                 TakenByGuestName = gift.TakenByGuestName,
                 TakenAt = gift.TakenAt,
                 IsTaken = gift.IsTaken,
-                RowVersion = gift.RowVersion
+                Version = gift.Version
             };
 
             return Ok(response);
@@ -149,7 +189,7 @@ public class GiftsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error releasing gift {GiftId}", id);
+            logger.LogError(ex, "Error releasing gift {GiftId}", id);
             return StatusCode(500, "An error occurred while releasing the gift");
         }
     }

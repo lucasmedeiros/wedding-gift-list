@@ -9,7 +9,7 @@ public class TakeGiftRequest
     public string GuestName { get; set; } = string.Empty;
     
     /// <summary>
-    /// Row version for optimistic concurrency control
+    /// Version for optimistic concurrency control
     /// </summary>
-    public byte[]? RowVersion { get; set; }
+    public int? Version { get; set; }
 }

@@ -2,14 +2,18 @@ export interface Gift {
   id: number;
   name: string;
   description: string;
-  imageUrl: string;
   takenByGuestName?: string;
   takenAt?: string;
   isTaken: boolean;
-  rowVersion: string; // Base64 encoded byte array
+  version: number; // Version for optimistic concurrency
 }
 
 export interface TakeGiftRequest {
   guestName: string;
-  rowVersion?: string;
+  version?: number;
+}
+
+export interface CreateGiftRequest {
+  name: string;
+  description?: string;
 }

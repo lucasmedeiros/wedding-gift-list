@@ -13,19 +13,16 @@ public class Gift
     [MaxLength(1000)]
     public string Description { get; set; } = string.Empty;
     
-    [MaxLength(500)]
-    public string ImageUrl { get; set; } = string.Empty;
-    
     [MaxLength(100)]
     public string? TakenByGuestName { get; set; }
     
     public DateTime? TakenAt { get; set; }
     
     /// <summary>
-    /// Row version for optimistic concurrency control
+    /// Version for optimistic concurrency control
     /// </summary>
-    [Timestamp]
-    public byte[] RowVersion { get; set; } = Array.Empty<byte>();
+    [ConcurrencyCheck]
+    public int Version { get; set; } = 1;
     
     /// <summary>
     /// Indicates if the gift has been taken by a guest
