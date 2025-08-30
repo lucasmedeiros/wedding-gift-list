@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WeddingGiftList.Api.Data;
+using WeddingGiftList.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,12 @@ builder.Services.AddCors(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add memory cache
+builder.Services.AddMemoryCache();
+
+// Add project singletons
+builder.Services.AddScoped<IGiftsService, GiftsService>();
 
 var app = builder.Build();
 

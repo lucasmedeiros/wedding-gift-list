@@ -1,37 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WeddingGiftList.Api.Data;
-using WeddingGiftList.Api.Models;
 using WeddingGiftList.Api.Models.DTOs;
+using WeddingGiftList.Api.Services;
 
 namespace WeddingGiftList.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class GiftsController(WeddingGiftListContext context, ILogger<GiftsController> logger)
+public class GiftsController(ILogger<GiftsController> logger, IGiftsService  giftsService)
     : ControllerBase
 {
     /// <summary>
     /// Get all gifts with their current status
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GiftResponse>>> GetGifts()
+    public async Task<ActionResult<IEnumerable<GiftResponse>>> GetGifts(CancellationToken cancellationToken)
     {
         try
         {
-            var gifts = await context.Gifts.ToListAsync();
-            var giftResponses = gifts.Select(g => new GiftResponse
-            {
-                Id = g.Id,
-                Name = g.Name,
-                Description = g.Description,
-                TakenByGuestName = g.TakenByGuestName,
-                TakenAt = g.TakenAt,
-                IsTaken = g.IsTaken,
-                Version = g.Version
-            });
-
-            return Ok(giftResponses);
+            var gifts = await giftsService.ListAsync(cancellationToken);
+            return Ok(gifts);
         }
         catch (Exception ex)
         {
@@ -44,7 +32,7 @@ public class GiftsController(WeddingGiftListContext context, ILogger<GiftsContro
     /// Create a new gift
     /// </summary>
     [HttpPost]
-    public async Task<ActionResult<GiftResponse>> CreateGift(CreateGiftRequest request)
+    public async Task<ActionResult<GiftResponse>> CreateGift(CreateGiftRequest request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -53,28 +41,9 @@ public class GiftsController(WeddingGiftListContext context, ILogger<GiftsContro
 
         try
         {
-            var gift = new Gift
-            {
-                Name = request.Name,
-                Description = request.Description,
-                Version = 1
-            };
+            var response = await giftsService.CreateAsync(request, cancellationToken);
 
-            context.Gifts.Add(gift);
-            await context.SaveChangesAsync();
-
-            var response = new GiftResponse
-            {
-                Id = gift.Id,
-                Name = gift.Name,
-                Description = gift.Description,
-                TakenByGuestName = gift.TakenByGuestName,
-                TakenAt = gift.TakenAt,
-                IsTaken = gift.IsTaken,
-                Version = gift.Version
-            };
-
-            return CreatedAtAction(nameof(GetGifts), new { id = gift.Id }, response);
+            return CreatedAtAction(nameof(CreateGift), new { id = response.Id }, response);
         }
         catch (Exception ex)
         {
@@ -87,7 +56,7 @@ public class GiftsController(WeddingGiftListContext context, ILogger<GiftsContro
     /// Take a gift (mark as taken by a guest)
     /// </summary>
     [HttpPost("{id}/take")]
-    public async Task<ActionResult<GiftResponse>> TakeGift(int id, TakeGiftRequest request)
+    public async Task<ActionResult<GiftResponse>> TakeGift(int id, TakeGiftRequest request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -96,46 +65,21 @@ public class GiftsController(WeddingGiftListContext context, ILogger<GiftsContro
 
         try
         {
-            var gift = await context.Gifts.FindAsync(id);
-            if (gift == null)
+            var response = await giftsService.TakeAsync(id, request, cancellationToken);
+            if (response == null)
             {
                 return NotFound($"Gift with ID {id} not found");
             }
-
-            if (gift.IsTaken)
-            {
-                return Conflict(new { message = "Gift has already been taken", takenBy = gift.TakenByGuestName });
-            }
-
-            // Check version for optimistic concurrency (if provided)
-            if (request.Version.HasValue && gift.Version != request.Version.Value)
-            {
-                return Conflict(new { message = "The gift was modified by another user. Please refresh and try again." });
-            }
-
-            // Update the gift
-            gift.TakenByGuestName = request.GuestName;
-            gift.TakenAt = DateTime.UtcNow;
-            gift.Version++; // Increment version for concurrency control
-
-            await context.SaveChangesAsync();
-
-            var response = new GiftResponse
-            {
-                Id = gift.Id,
-                Name = gift.Name,
-                Description = gift.Description,
-                TakenByGuestName = gift.TakenByGuestName,
-                TakenAt = gift.TakenAt,
-                IsTaken = gift.IsTaken,
-                Version = gift.Version
-            };
 
             return Ok(response);
         }
         catch (DbUpdateConcurrencyException)
         {
             return Conflict(new { message = "The gift was modified by another user. Please refresh and try again." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
@@ -148,44 +92,25 @@ public class GiftsController(WeddingGiftListContext context, ILogger<GiftsContro
     /// Release a gift (make it available again)
     /// </summary>
     [HttpPost("{id}/release")]
-    public async Task<ActionResult<GiftResponse>> ReleaseGift(int id)
+    public async Task<ActionResult<GiftResponse>> ReleaseGift(int id, CancellationToken cancellationToken)
     {
         try
         {
-            var gift = await context.Gifts.FindAsync(id);
-            if (gift == null)
+            var response = await giftsService.ReleaseAsync(id, cancellationToken);
+            if (response == null)
             {
                 return NotFound($"Gift with ID {id} not found");
             }
-
-            if (!gift.IsTaken)
-            {
-                return BadRequest("Gift is not currently taken");
-            }
-
-            // Release the gift
-            gift.TakenByGuestName = null;
-            gift.TakenAt = null;
-            gift.Version++; // Increment version for concurrency control
-
-            await context.SaveChangesAsync();
-
-            var response = new GiftResponse
-            {
-                Id = gift.Id,
-                Name = gift.Name,
-                Description = gift.Description,
-                TakenByGuestName = gift.TakenByGuestName,
-                TakenAt = gift.TakenAt,
-                IsTaken = gift.IsTaken,
-                Version = gift.Version
-            };
 
             return Ok(response);
         }
         catch (DbUpdateConcurrencyException)
         {
             return Conflict(new { message = "The gift was modified by another user. Please refresh and try again." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
