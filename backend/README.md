@@ -28,5 +28,5 @@ docker run -d --name wedding-gifts -p 80:8080 -v ~/wedding-gift-data:/opt/weddin
 ```sh
 docker ps # ver status do container
 docker logs wedding-gifts # ver logs da aplicação
-curl http://SEU_IP_EC2/ # testar acesso à API
+curl http://18.219.60.144/ # testar acesso à API
 ```
