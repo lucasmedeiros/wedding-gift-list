@@ -15,13 +15,15 @@ A beautiful, responsive wedding gift list application where guests can view and 
 - 🇧🇷 **Portuguese Language**: Fully translated to Brazilian Portuguese
 - ⚡ **Real-time Updates**: See gift availability in real-time
 - 🎨 **Elegant UI**: Designed with Tailwind CSS for a modern look
+- 🐋 **Docker Deployment**: Containerized backend for easy deployment and scaling
 
 ## Architecture
 
 - **Frontend**: React 18 with TypeScript, styled with Tailwind CSS
-- **Backend**: .NET 8 Web API with Entity Framework Core
-- **Database**: SQLite (simple and efficient)
-- **Deployment**: GitHub Pages (frontend) + AWS EC2 (backend)
+- **Backend**: .NET 8 Web API with Entity Framework Core (Containerized)
+- **Database**: SQLite in persistent Docker volume
+- **Deployment**: GitHub Pages (frontend) + Docker on AWS EC2 (backend)
+- **Proxy**: Nginx reverse proxy to Docker container
 
 ## Quick Start (Development)
 
@@ -55,23 +57,27 @@ A beautiful, responsive wedding gift list application where guests can view and 
 
 ## Production Deployment
 
-We've configured a simple, cost-effective, **tag-based deployment** strategy:
+We've configured a simple, cost-effective, **Docker-based deployment** strategy:
 
 - **Frontend**: GitHub Pages (Free)
-- **Backend**: AWS EC2 Free Tier - Amazon Linux 2023 (Free for 12 months)
+- **Backend**: Docker Container on AWS EC2 Free Tier (Free for 12 months)
+- **Database**: SQLite in persistent Docker volume
 - **CI/CD**: GitHub Actions (Free) - triggered by version tags
-- **Deployment**: Use `.\deploy.ps1` (PowerShell) script for easy versioned releases
+- **Deployment**: Use `.\deploy-docker.ps1` (PowerShell) script for containerized releases
 
-**👉 [Complete Deployment Guide](DEPLOYMENT.md)**
+**👉 [Complete Docker Deployment Guide](DOCKER-DEPLOYMENT.md)**
 
-### Quick Deploy (Windows)
+### Quick Docker Deploy (Windows)
 ```powershell
-.\deploy.ps1  # Interactive deployment with version tagging
+.\deploy-docker.ps1  # Interactive Docker deployment with version tagging
 ```
 
-### Quick Setup (Amazon Linux 2023)
-```powershell
-.\setup-amazon-linux.ps1  # Configure for your EC2 instance
+### Quick EC2 Docker Setup
+```bash
+# SSH to your EC2 and run:
+wget https://raw.githubusercontent.com/lucasmedeiros/wedding-gift-list/main/backend/deploy-scripts/setup-ec2-docker.sh
+chmod +x setup-ec2-docker.sh
+./setup-ec2-docker.sh
 ```
 
 ## Project Structure
