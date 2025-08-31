@@ -173,7 +173,7 @@ Write-Host ""
 Write-Host ">> If deployment fails:" -ForegroundColor $Yellow
 Write-Host "   1. Check GitHub Actions logs for detailed errors"
 Write-Host "   2. For SSH errors: verify GITHUB-SECRETS-SETUP.md"
-Write-Host "   3. Test SSH connection manually: ssh -i your-key.pem ubuntu@YOUR_EC2_IP"
+Write-Host "   3. Test SSH connection manually: ssh -i your-key.pem ec2-user@YOUR_EC2_IP"
 Write-Host ""
 
 # Offer to open GitHub Actions

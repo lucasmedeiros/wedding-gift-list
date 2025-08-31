@@ -18,7 +18,7 @@ This guide will help you deploy your Wedding Gift List application using:
 
 1. Login to AWS Console → EC2
 2. Click "Launch Instance"
-3. Choose **Ubuntu Server 22.04 LTS** (Free Tier Eligible)
+3. Choose **Amazon Linux 2023 AMI** (Free Tier Eligible) - ami-0b016c703b95ecbe4
 4. Instance type: **t2.micro** (Free Tier Eligible)
 5. Create new key pair or use existing one (**SAVE THE .pem FILE!**)
 6. Security Group settings:
@@ -31,7 +31,7 @@ This guide will help you deploy your Wedding Gift List application using:
 
 1. Connect to your EC2 instance via SSH:
    ```bash
-   ssh -i your-key.pem ubuntu@YOUR_EC2_PUBLIC_IP
+   ssh -i your-key.pem ec2-user@YOUR_EC2_PUBLIC_IP
    ```
 
 2. Run the setup script:
@@ -92,7 +92,7 @@ Go to Settings → Secrets and Variables → Actions, add these secrets:
 **Backend Secrets:**
 - `EC2_SSH_KEY`: Contents of your .pem key file
 - `EC2_HOST`: Your EC2 public IP address
-- `EC2_USER`: `ubuntu`
+- `EC2_USER`: `ec2-user`
 
 ### 3.3 How to Add SSH Key Secret
 

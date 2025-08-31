@@ -56,7 +56,7 @@ MIIEpAIBAAKCAQEA1234567890abcdef...
 
 #### **EC2_USER:**
 - Nome: `EC2_USER`
-- Valor: `ubuntu`
+- Valor: `ec2-user`
 
 #### **REACT_APP_API_URL:**
 - Nome: `REACT_APP_API_URL`
@@ -111,8 +111,8 @@ Depois de configurar todos os secrets:
 - ✅ Verifique se a EC2 está rodando
 
 ### **"sudo: command not found"**
-- ✅ Use `ubuntu` como usuário, não `ec2-user`
-- ✅ Verifique se a EC2 é Ubuntu 22.04
+- ✅ Use `ec2-user` como usuário, não `ubuntu`  
+- ✅ Verifique se a EC2 é Amazon Linux 2023
 
 ### **"File not found: deploy.zip"**
 - ✅ Problema no workflow - rerun o deployment
@@ -171,3 +171,4 @@ sudo journalctl -u wedding-gift-api -f
 - **Monitore** os logs do GitHub Actions para debuggar
 - **Use** IPs específicos, não hostnames
 - **Mantenha** sua EC2 atualizada: `sudo apt update && sudo apt upgrade`
+

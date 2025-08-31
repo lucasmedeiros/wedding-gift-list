@@ -12,6 +12,10 @@ APP_DIR="/opt/$APP_NAME"
 SERVICE_NAME="$APP_NAME.service"
 PUBLISH_DIR="./publish"
 
+# Detect current user for proper paths
+CURRENT_USER=$(whoami)
+echo "Current user: $CURRENT_USER"
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -27,6 +31,9 @@ sudo mkdir -p $APP_DIR
 echo -e "${YELLOW}Copying application files...${NC}"
 sudo cp -r $PUBLISH_DIR/* $APP_DIR/
 
+echo -e "${YELLOW}Creating data directory for SQLite...${NC}"
+sudo mkdir -p $APP_DIR/data
+
 echo -e "${YELLOW}Setting up service configuration...${NC}"
 sudo tee /etc/systemd/system/$SERVICE_NAME > /dev/null <<EOF
 [Unit]
@@ -35,8 +42,8 @@ After=network.target
 
 [Service]
 Type=notify
-User=www-data
-Group=www-data
+User=nginx
+Group=nginx
 WorkingDirectory=$APP_DIR
 ExecStart=/usr/bin/dotnet $APP_DIR/WeddingGiftList.Api.dll
 Restart=always
@@ -52,8 +59,9 @@ WantedBy=multi-user.target
 EOF
 
 echo -e "${YELLOW}Setting permissions...${NC}"
-sudo chown -R www-data:www-data $APP_DIR
+sudo chown -R nginx:nginx $APP_DIR
 sudo chmod +x $APP_DIR/WeddingGiftList.Api.dll || true
+sudo chmod 755 $APP_DIR/data
 
 echo -e "${YELLOW}Reloading systemd and starting service...${NC}"
 sudo systemctl daemon-reload

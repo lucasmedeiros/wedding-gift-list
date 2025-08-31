@@ -58,16 +58,20 @@ A beautiful, responsive wedding gift list application where guests can view and 
 We've configured a simple, cost-effective, **tag-based deployment** strategy:
 
 - **Frontend**: GitHub Pages (Free)
-- **Backend**: AWS EC2 Free Tier (Free for 12 months)
+- **Backend**: AWS EC2 Free Tier - Amazon Linux 2023 (Free for 12 months)
 - **CI/CD**: GitHub Actions (Free) - triggered by version tags
-- **Deployment**: Use `./deploy.sh` script for easy versioned releases
+- **Deployment**: Use `.\deploy.ps1` (PowerShell) script for easy versioned releases
 
 **👉 [Complete Deployment Guide](DEPLOYMENT.md)**
 
-### Quick Deploy
-```bash
-chmod +x deploy.sh
-./deploy.sh  # Interactive deployment with version tagging
+### Quick Deploy (Windows)
+```powershell
+.\deploy.ps1  # Interactive deployment with version tagging
+```
+
+### Quick Setup (Amazon Linux 2023)
+```powershell
+.\setup-amazon-linux.ps1  # Configure for your EC2 instance
 ```
 
 ## Project Structure

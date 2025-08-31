@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# AWS EC2 Initial Setup Script for Ubuntu 22.04
+# AWS EC2 Initial Setup Script for Amazon Linux 2023
 # Run this once when setting up your EC2 instance
 
 set -e
@@ -15,35 +15,36 @@ NC='\033[0m'
 
 # Update system
 echo -e "${YELLOW}Updating system packages...${NC}"
-sudo apt update && sudo apt upgrade -y
+sudo dnf update -y
 
 # Install required packages
 echo -e "${YELLOW}Installing required packages...${NC}"
-sudo apt install -y wget curl unzip nginx
+sudo dnf install -y wget curl unzip nginx
 
 # Install .NET 8 SDK
 echo -e "${YELLOW}Installing .NET 8 SDK...${NC}"
-wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-sudo dpkg -i packages-microsoft-prod.deb
-rm packages-microsoft-prod.deb
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+sudo wget -O /etc/yum.repos.d/microsoft-prod.repo https://packages.microsoft.com/config/rhel/8/prod.repo
 
-sudo apt update
-sudo apt install -y dotnet-sdk-8.0
+sudo dnf update -y
+sudo dnf install -y dotnet-sdk-8.0
 
 # Verify .NET installation
 echo -e "${YELLOW}Verifying .NET installation...${NC}"
 dotnet --version
 
-# Create www-data user if it doesn't exist
-echo -e "${YELLOW}Setting up www-data user...${NC}"
-sudo useradd -r -s /bin/false www-data || echo "www-data user already exists"
+# Create nginx user if it doesn't exist (Amazon Linux uses nginx user)
+echo -e "${YELLOW}Setting up nginx user...${NC}"
+sudo useradd -r -s /bin/false nginx || echo "nginx user already exists"
 
-# Configure firewall (UFW)
+# Configure firewall (firewalld)
 echo -e "${YELLOW}Configuring firewall...${NC}"
-sudo ufw --force enable
-sudo ufw allow ssh
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
+sudo systemctl enable firewalld
+sudo systemctl start firewalld
+sudo firewall-cmd --permanent --add-service=ssh
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-service=https
+sudo firewall-cmd --reload
 
 # Start and enable nginx
 echo -e "${YELLOW}Starting Nginx...${NC}"
@@ -53,7 +54,7 @@ sudo systemctl enable nginx
 # Create application directory
 echo -e "${YELLOW}Creating application directory...${NC}"
 sudo mkdir -p /opt/wedding-gift-api
-sudo chown -R www-data:www-data /opt/wedding-gift-api
+sudo chown -R nginx:nginx /opt/wedding-gift-api
 
 echo -e "${GREEN}EC2 setup completed successfully!${NC}"
 echo -e "${GREEN}Your server is ready for deployment.${NC}"
