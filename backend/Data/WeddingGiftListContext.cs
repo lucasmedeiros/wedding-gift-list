@@ -65,7 +65,9 @@ public class WeddingGiftListContext(DbContextOptions<WeddingGiftListContext> opt
             new Gift { Id = 40, Name = "Porta guardanapos", Description = "Porta guardanapos de cristal" },
             new Gift { Id = 41, Name = "Alexa", Description = "Echo Dot (Geração mais recente)" },
             new Gift { Id = 42, Name = "Robô aspirador", Description = "Robô Aspirador Passa Pano KaBuM! smart 900 (com mapeamento 3D)" },
-            new Gift { Id = 43, Name = "Gelágua", Description = "Gelágua de Coluna Água Natural e Gelada 220V" }
+            new Gift { Id = 43, Name = "Gelágua", Description = "Gelágua de Coluna Água Natural e Gelada 220V" },
+            new Gift { Id = 44, Name = "Kit de banheiro", Description = "Acessórios de banheiro, como suporte para toalha, suporte para papel higiênico, etc. Cor preta" },
+            new Gift { Id = 45, Name = "Rede de balanço", Description = "Rede de balanço para descanso" }
         );
     }
 }

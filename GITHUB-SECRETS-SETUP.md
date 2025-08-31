@@ -12,7 +12,7 @@ Vá para **Settings → Secrets and variables → Actions** no seu repositório 
 ### **Backend Secrets:**
 - `EC2_SSH_KEY`: Chave SSH privada (.pem)
 - `EC2_HOST`: IP público da EC2 (ex: `18.219.60.144`)  
-- `EC2_USER`: Usuário SSH (geralmente `ubuntu`)
+- `EC2_USER`: Usuário SSH (geralmente `ec2-user`)
 
 ## 🛠️ **Configuração Passo a Passo**
 
@@ -68,14 +68,14 @@ SSH na sua EC2 e verifique:
 
 ```bash
 # SSH para EC2
-ssh -i your-key.pem ubuntu@18.219.60.144
+ssh -i your-key.pem ec2-user@18.219.60.144
 
-# Verificar se o usuário ubuntu pode usar sudo
+# Verificar se o usuário ec2-user pode usar sudo
 sudo whoami
 # Deve retornar: root
 
 # Verificar se as pastas existem
-ls -la /home/ubuntu/
+ls -la /home/ec2-user/
 ls -la /opt/
 
 # Sair
@@ -87,7 +87,7 @@ exit
 ### **Teste Local (antes do deployment):**
 ```powershell
 # Teste a conexão SSH localmente
-ssh -i your-key.pem ubuntu@18.219.60.144
+ssh -i your-key.pem ec2-user@18.219.60.144
 
 # Se conectar com sucesso, sua chave está correta
 # Digite 'exit' para sair
@@ -109,10 +109,6 @@ Depois de configurar todos os secrets:
 ### **"Host key verification failed"**
 - ✅ EC2 Security Group deve permitir SSH (porta 22) do seu IP
 - ✅ Verifique se a EC2 está rodando
-
-### **"sudo: command not found"**
-- ✅ Use `ec2-user` como usuário, não `ubuntu`  
-- ✅ Verifique se a EC2 é Amazon Linux 2023
 
 ### **"File not found: deploy.zip"**
 - ✅ Problema no workflow - rerun o deployment
@@ -148,7 +144,7 @@ Depois de configurar tudo:
 
 1. **SSH Test Manual:**
 ```powershell
-ssh -i your-key.pem ubuntu@YOUR_EC2_IP "echo 'SSH works!'"
+ssh -i your-key.pem ec2-user@YOUR_EC2_IP "echo 'SSH works!'"
 ```
 
 2. **Check GitHub Actions Logs:**
@@ -158,7 +154,7 @@ ssh -i your-key.pem ubuntu@YOUR_EC2_IP "echo 'SSH works!'"
 3. **EC2 Logs:**
 ```bash
 # SSH para EC2
-ssh -i your-key.pem ubuntu@YOUR_EC2_IP
+ssh -i your-key.pem ec2-user@YOUR_EC2_IP
 
 # Verificar logs do serviço
 sudo journalctl -u wedding-gift-api -f
