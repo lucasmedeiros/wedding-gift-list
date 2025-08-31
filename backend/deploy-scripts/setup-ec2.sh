@@ -37,6 +37,10 @@ dotnet --version
 echo -e "${YELLOW}Setting up nginx user...${NC}"
 sudo useradd -r -s /bin/false nginx || echo "nginx user already exists"
 
+# Also create a wedding-gift service user as backup
+echo -e "${YELLOW}Setting up application user...${NC}"
+sudo useradd -r -s /bin/false wedding-gift || echo "wedding-gift user already exists"
+
 # Configure firewall (firewalld)
 echo -e "${YELLOW}Configuring firewall...${NC}"
 sudo systemctl enable firewalld
@@ -54,7 +58,18 @@ sudo systemctl enable nginx
 # Create application directory
 echo -e "${YELLOW}Creating application directory...${NC}"
 sudo mkdir -p /opt/wedding-gift-api
-sudo chown -R nginx:nginx /opt/wedding-gift-api
+
+# Set ownership - try nginx first, fallback to wedding-gift user
+if id "nginx" &>/dev/null; then
+    echo -e "${YELLOW}Using nginx user for app directory...${NC}"
+    sudo chown -R nginx:nginx /opt/wedding-gift-api
+elif id "wedding-gift" &>/dev/null; then
+    echo -e "${YELLOW}Using wedding-gift user for app directory...${NC}"  
+    sudo chown -R wedding-gift:wedding-gift /opt/wedding-gift-api
+else
+    echo -e "${YELLOW}Using ec2-user for app directory...${NC}"
+    sudo chown -R ec2-user:ec2-user /opt/wedding-gift-api
+fi
 
 echo -e "${GREEN}EC2 setup completed successfully!${NC}"
 echo -e "${GREEN}Your server is ready for deployment.${NC}"

@@ -16,6 +16,19 @@ PUBLISH_DIR="./publish"
 CURRENT_USER=$(whoami)
 echo "Current user: $CURRENT_USER"
 
+# Detect which service user to use
+SERVICE_USER="nginx"
+if id "nginx" &>/dev/null; then
+    SERVICE_USER="nginx"
+    echo "Using nginx user for service"
+elif id "wedding-gift" &>/dev/null; then
+    SERVICE_USER="wedding-gift"
+    echo "Using wedding-gift user for service"
+else
+    SERVICE_USER="ec2-user"
+    echo "Using ec2-user for service"
+fi
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -42,8 +55,8 @@ After=network.target
 
 [Service]
 Type=notify
-User=nginx
-Group=nginx
+User=$SERVICE_USER
+Group=$SERVICE_USER
 WorkingDirectory=$APP_DIR
 ExecStart=/usr/bin/dotnet $APP_DIR/WeddingGiftList.Api.dll
 Restart=always
@@ -59,7 +72,7 @@ WantedBy=multi-user.target
 EOF
 
 echo -e "${YELLOW}Setting permissions...${NC}"
-sudo chown -R nginx:nginx $APP_DIR
+sudo chown -R $SERVICE_USER:$SERVICE_USER $APP_DIR
 sudo chmod +x $APP_DIR/WeddingGiftList.Api.dll || true
 sudo chmod 755 $APP_DIR/data
 
