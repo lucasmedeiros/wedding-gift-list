@@ -41,22 +41,15 @@ jobs:
         cd backend
         zip -r ../deploy.zip ./publish/* deploy-scripts/*
 
-    - name: Setup SSH
+    - name: Configure SSH
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/deploy_key
-        chmod 600 ~/.ssh/deploy_key
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
+        chmod 600 ~/.ssh/ec2_key
         ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-    - name: Copy files to EC2
+    - name: Upload package to EC2
       run: |
-        scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no deploy.zip ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/
-
-    - name: Deploy on EC2
-      run: |
-        ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-        cd ~
-        unzip -o deploy.zip
-        chmod +x deploy-scripts/*.sh
-        sudo ./deploy-scripts/deploy.sh
-        EOF
+        scp -i ~/.ssh/ec2_key deploy.zip ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/deploy.zip
+    
+    
