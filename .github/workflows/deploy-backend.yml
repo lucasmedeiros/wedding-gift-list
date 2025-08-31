@@ -16,63 +16,40 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: |
+        cd backend
+        dotnet restore
+
+    - name: Build
+      run: |
+        cd backend
+        dotnet build --configuration Release --no-restore
+
+    - name: Publish
+      run: |
+        cd backend
+        dotnet publish -c Release -o ./publish
+
     - name: Create deployment package
       run: |
-        # Create a clean deployment package with only necessary files
-        mkdir -p deploy-package/backend
-        
-        # Copy backend source code (excluding build artifacts)
-        cp -r backend/* deploy-package/backend/
-        
-        # Remove build artifacts and unnecessary files
-        rm -rf deploy-package/backend/bin
-        rm -rf deploy-package/backend/obj
-        rm -f deploy-package/backend/*.db
-        rm -f deploy-package/backend/*.db-*
-        
-        # Create deployment archive
-        cd deploy-package
-        tar -czf ../deploy.tar.gz .
-        cd ..
+        cd backend
+        zip -r ../deploy.zip ./publish/* deploy-scripts/*
 
-    - name: Setup SSH
+    - name: Configure SSH
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/deploy_key
-        chmod 600 ~/.ssh/deploy_key
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
+        chmod 600 ~/.ssh/ec2_key
         ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-    - name: Copy files to EC2
+    - name: Upload package to EC2
       run: |
-        scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/
-
-    - name: Deploy Docker Container on EC2
-      run: |
-        ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-        set -e
-        
-        echo "🐋 Starting Docker deployment..."
-        
-        # Navigate to application directory
-        sudo mkdir -p /opt/wedding-gift-api
-        sudo chown -R ec2-user:ec2-user /opt/wedding-gift-api
-        cd /opt/wedding-gift-api
-        
-        # Extract deployment package
-        echo "📦 Extracting deployment package..."
-        tar -xzf ~/deploy.tar.gz
-        
-        # Make deployment script executable
-        chmod +x backend/deploy-scripts/deploy-docker.sh
-        
-        # Run Docker deployment
-        echo "🚀 Running Docker deployment..."
-        ./backend/deploy-scripts/deploy-docker.sh
-        
-        # Cleanup
-        rm -f ~/deploy.tar.gz
-        
-        echo "✅ Docker deployment completed!"
-        EOF
+        scp -i ~/.ssh/ec2_key deploy.zip ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/deploy.zip
     
     
