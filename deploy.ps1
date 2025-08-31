@@ -157,16 +157,23 @@ switch ($Choice) {
     "2" {
         Write-Host "   - Backend will deploy to your AWS EC2 instance"
         Write-Host "   - Expected deploy time: ~3-5 minutes"
+        Write-Host "   - Make sure GitHub secrets are configured (see GITHUB-SECRETS-SETUP.md)"
     }
     "3" {
         Write-Host "   - Frontend will deploy to: https://lucasmedeiros.github.io/wedding-gift-list"
         Write-Host "   - Backend will deploy to your AWS EC2 instance"
         Write-Host "   - Expected total deploy time: ~5-8 minutes"
+        Write-Host "   - Make sure GitHub secrets are configured (see GITHUB-SECRETS-SETUP.md)"
     }
 }
 
 Write-Host ""
 Write-Host ">> Deployment initiated! Check the GitHub Actions link above for progress." -ForegroundColor $Green
+Write-Host ""
+Write-Host ">> If deployment fails:" -ForegroundColor $Yellow
+Write-Host "   1. Check GitHub Actions logs for detailed errors"
+Write-Host "   2. For SSH errors: verify GITHUB-SECRETS-SETUP.md"
+Write-Host "   3. Test SSH connection manually: ssh -i your-key.pem ubuntu@YOUR_EC2_IP"
 Write-Host ""
 
 # Offer to open GitHub Actions

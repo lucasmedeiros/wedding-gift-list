@@ -41,15 +41,23 @@ jobs:
         cd backend
         zip -r ../deploy.zip ./publish/* deploy-scripts/*
 
-    - name: Deploy to AWS EC2
-      uses: easingthemes/ssh-deploy@main
+    - name: Copy files to EC2
+      uses: appleboy/scp-action@v0.1.7
       with:
-        SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-        REMOTE_HOST: ${{ secrets.EC2_HOST }}
-        REMOTE_USER: ${{ secrets.EC2_USER }}
-        SOURCE: "deploy.zip"
-        TARGET: "/home/${{ secrets.EC2_USER }}/"
-        SCRIPT_AFTER: |
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "deploy.zip"
+        target: "/home/${{ secrets.EC2_USER }}/"
+
+    - name: Deploy on EC2
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd /home/${{ secrets.EC2_USER }}/
           unzip -o deploy.zip
           chmod +x deploy-scripts/*.sh
-          ./deploy-scripts/deploy.sh
+          sudo ./deploy-scripts/deploy.sh
