@@ -5,7 +5,7 @@ namespace WeddingGiftList.Api.Data;
 
 public class WeddingGiftListContext(DbContextOptions<WeddingGiftListContext> options) : DbContext(options)
 {
-    public DbSet<Gift> Gifts { get; set; } = default!;
+    public DbSet<Gift> Gifts { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
