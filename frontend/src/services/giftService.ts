@@ -1,6 +1,6 @@
 import { Gift, TakeGiftRequest } from '../types/Gift';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5139';
 
 export class GiftService {
   private static async handleResponse<T>(response: Response): Promise<T> {

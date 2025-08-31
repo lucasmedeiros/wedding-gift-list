@@ -33,7 +33,7 @@ export const TakeGiftModal: React.FC<TakeGiftModalProps> = ({
         <div className="p-6">
           <div className="flex justify-between items-start mb-4">
             <h2 className="text-2xl font-elegant font-semibold text-secondary-900">
-              Take Gift
+              Escolher Presente
             </h2>
             <button
               onClick={onClose}
@@ -47,17 +47,6 @@ export const TakeGiftModal: React.FC<TakeGiftModalProps> = ({
           </div>
           
           <div className="mb-6">
-            <div className="aspect-w-16 aspect-h-9 mb-4 rounded-lg overflow-hidden">
-              <img 
-                src={gift.imageUrl} 
-                alt={gift.name}
-                className="w-full h-32 object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = `https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop&auto=format`;
-                }}
-              />
-            </div>
             <h3 className="text-lg font-semibold text-secondary-900 mb-2">
               {gift.name}
             </h3>
@@ -69,14 +58,14 @@ export const TakeGiftModal: React.FC<TakeGiftModalProps> = ({
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="guestName" className="block text-sm font-medium text-secondary-700 mb-2">
-                Your Name
+                Seu Nome
               </label>
               <input
                 type="text"
                 id="guestName"
                 value={guestName}
                 onChange={(e) => setGuestName(e.target.value)}
-                placeholder="Enter your full name"
+                placeholder="Digite seu nome completo"
                 className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                 required
                 disabled={isLoading}
@@ -91,7 +80,7 @@ export const TakeGiftModal: React.FC<TakeGiftModalProps> = ({
                 className="flex-1 px-4 py-3 border border-secondary-300 text-secondary-700 rounded-lg hover:bg-secondary-50 transition-colors font-medium"
                 disabled={isLoading}
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 type="submit"
@@ -104,10 +93,10 @@ export const TakeGiftModal: React.FC<TakeGiftModalProps> = ({
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Taking...
+                    Escolhendo...
                   </>
                 ) : (
-                  'Confirm'
+                  'Confirmar'
                 )}
               </button>
             </div>

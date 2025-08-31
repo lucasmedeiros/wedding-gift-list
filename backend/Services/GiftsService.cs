@@ -25,7 +25,7 @@ public class GiftsService(WeddingGiftListContext context, IMemoryCache memoryCac
         }
 
         var giftsResponsesFromDb = await ListGiftsInternalAsync(cancellationToken);
-        var cacheEntryOptions = new MemoryCacheEntryOptions();
+        var cacheEntryOptions = BuildCacheEntryOptions();
         memoryCache.Set(cacheKey, giftsResponsesFromDb, cacheEntryOptions);
         
         return giftsResponsesFromDb;
@@ -79,9 +79,43 @@ public class GiftsService(WeddingGiftListContext context, IMemoryCache memoryCac
 
         context.Gifts.Add(gift);
         await context.SaveChangesAsync(cancellationToken);
-        UpdateGiftCache(gift);
         DestroyGiftsCache();
         
+        return new GiftResponse
+        {
+            Id = gift.Id,
+            Name = gift.Name,
+            Description = gift.Description,
+            TakenByGuestName = gift.TakenByGuestName,
+            TakenAt = gift.TakenAt,
+            IsTaken = gift.IsTaken,
+            Version = gift.Version
+        };
+    }
+
+    public async Task<GiftResponse?> UpdateAsync(int id, UpdateGiftRequest request, CancellationToken cancellationToken)
+    {
+        var gift = await FindInternalAsync(id, cancellationToken);
+        if (gift == null)
+        {
+            return null;
+        }
+
+        if (!string.IsNullOrEmpty(request.Name))
+        {
+            gift.Name = request.Name;
+        }
+
+        if (!string.IsNullOrEmpty(request.Description))
+        {
+            gift.Description = request.Description;
+        }
+
+        gift.Version++; // Increment version for concurrency control
+        await context.SaveChangesAsync(cancellationToken);
+        DestroyGiftCache(gift.Id);
+        DestroyGiftsCache();
+
         return new GiftResponse
         {
             Id = gift.Id,
@@ -103,7 +137,8 @@ public class GiftsService(WeddingGiftListContext context, IMemoryCache memoryCac
         }
         
         var giftFromDb = await context.Gifts.FindAsync([id], cancellationToken: cancellationToken);
-        memoryCache.Set(cacheKey, giftFromDb);
+        var options = BuildCacheEntryOptions();
+        memoryCache.Set(cacheKey, giftFromDb, options);
         
         return giftFromDb;
     }
@@ -130,7 +165,7 @@ public class GiftsService(WeddingGiftListContext context, IMemoryCache memoryCac
         gift.TakenAt = DateTime.UtcNow;
         gift.Version++; // Increment version for concurrency control
         await context.SaveChangesAsync(cancellationToken);
-        UpdateGiftCache(gift);
+        DestroyGiftCache(gift.Id);
         DestroyGiftsCache();
 
         return new GiftResponse
@@ -163,7 +198,7 @@ public class GiftsService(WeddingGiftListContext context, IMemoryCache memoryCac
         gift.TakenAt = null;
         gift.Version++; // Increment version for concurrency control
         await context.SaveChangesAsync(cancellationToken);
-        UpdateGiftCache(gift);
+        DestroyGiftCache(gift.Id);
         DestroyGiftsCache();
         
         return new GiftResponse
@@ -204,15 +239,6 @@ public class GiftsService(WeddingGiftListContext context, IMemoryCache memoryCac
     {
         var cacheKey = BuildGiftByIdCacheKey(id);
         memoryCache.Remove(cacheKey);
-    }
-
-    private void UpdateGiftCache(Gift gift)
-    {
-        var cacheKey = BuildGiftByIdCacheKey(gift.Id);
-
-        var options = BuildCacheEntryOptions();
-
-        memoryCache.Set(cacheKey, gift, options);
     }
 
     private static MemoryCacheEntryOptions BuildCacheEntryOptions()

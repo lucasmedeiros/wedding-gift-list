@@ -71,6 +71,52 @@ public class GiftsController(ILogger<GiftsController> logger, IGiftsService  gif
             return StatusCode(500, "An error occurred while creating the gift");
         }
     }
+    
+    /// <summary>
+    /// Update a existing gift in the wedding gift list
+    /// </summary>
+    /// <param name="request">The gift creation request containing name and description</param>
+    /// <param name="cancellationToken">Cancellation token for the operation</param>
+    /// <returns>The newly created gift</returns>
+    /// <response code="201">Returns the newly created gift</response>
+    /// <response code="400">If the request is invalid</response>
+    /// <response code="500">If there was an internal server error</response>
+    [HttpPut("{id}")]
+    [ProducesResponseType(typeof(GiftResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<GiftResponse>> UpdateGift(int id, UpdateGiftRequest request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var response = await giftsService.UpdateAsync(id, request, cancellationToken);
+
+            if (response == null)
+            {
+                return NotFound($"Gift with ID {id} not found");
+            }
+
+            return Ok(response);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Conflict(new { message = "The gift was modified by another user. Please refresh and try again." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error creating gift");
+            return StatusCode(500, "An error occurred while creating the gift");
+        }
+    }
 
     /// <summary>
     /// Takes a gift (marks it as taken by a guest)
