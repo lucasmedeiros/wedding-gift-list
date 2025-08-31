@@ -1,6 +1,10 @@
 import { Gift, TakeGiftRequest } from '../types/Gift';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5139';
+// Use environment variable for production, localhost for development
+const API_BASE_URL = process.env.REACT_APP_API_URL || 
+  (process.env.NODE_ENV === 'production' 
+    ? 'http://18.219.60.144'
+    : 'http://localhost:5139');
 
 export class GiftService {
   private static async handleResponse<T>(response: Response): Promise<T> {

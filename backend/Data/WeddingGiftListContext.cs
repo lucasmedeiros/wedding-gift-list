@@ -64,7 +64,8 @@ public class WeddingGiftListContext(DbContextOptions<WeddingGiftListContext> opt
             new Gift { Id = 39, Name = "Formas de air fryer", Description = "Kit 2 formas de silicone para air fryer com alça antiaderente, reutilizável, resistente ao calor" },
             new Gift { Id = 40, Name = "Porta guardanapos", Description = "Porta guardanapos de cristal" },
             new Gift { Id = 41, Name = "Alexa", Description = "Echo Dot (Geração mais recente)" },
-            new Gift { Id = 42, Name = "Robô aspirador", Description = "Robô Aspirador Passa Pano KaBuM! smart 900 (com mapeamento 3D)" }
+            new Gift { Id = 42, Name = "Robô aspirador", Description = "Robô Aspirador Passa Pano KaBuM! smart 900 (com mapeamento 3D)" },
+            new Gift { Id = 43, Name = "Gelágua", Description = "Gelágua de Coluna Água Natural e Gelada 220V" }
         );
     }
 }

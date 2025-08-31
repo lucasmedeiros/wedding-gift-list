@@ -1,127 +1,158 @@
-# Wedding Gift List
+# Wedding Gift List 💕
 
-An elegant wedding gift list website where guests can view and claim gifts with concurrency control to prevent conflicts.
+A beautiful, responsive wedding gift list application where guests can view and select gifts for your special day.
+
+![Wedding Gift List](https://img.shields.io/badge/Status-Ready%20for%20Deployment-green)
+![.NET 8](https://img.shields.io/badge/.NET-8.0-blue)
+![React](https://img.shields.io/badge/React-18.2-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-4.9-blue)
 
 ## Features
 
-- **Beautiful UI**: Clean, responsive design with soft shadows and elegant typography
-- **Real-time Updates**: Gifts are immediately marked as taken to prevent conflicts
-- **Concurrency Control**: Optimistic concurrency control prevents multiple guests from taking the same gift
-- **Mobile Friendly**: Fully responsive design that works on all devices
-- **Simple Deployment**: Containerized with Docker for easy deployment
+- 🎁 **Beautiful Gift Display**: Clean, modern interface showing available gifts
+- 📱 **Responsive Design**: Works perfectly on desktop, tablet, and mobile
+- 🔒 **Gift Reservation**: Guests can reserve gifts with their name
+- 🇧🇷 **Portuguese Language**: Fully translated to Brazilian Portuguese
+- ⚡ **Real-time Updates**: See gift availability in real-time
+- 🎨 **Elegant UI**: Designed with Tailwind CSS for a modern look
 
-## Tech Stack
+## Architecture
 
-- **Backend**: .NET 8 ASP.NET Core Web API
-- **Database**: SQLite with Entity Framework Core
-- **Frontend**: React 18 with TypeScript
-- **Styling**: TailwindCSS
-- **Containerization**: Docker
+- **Frontend**: React 18 with TypeScript, styled with Tailwind CSS
+- **Backend**: .NET 8 Web API with Entity Framework Core
+- **Database**: SQLite (simple and efficient)
+- **Deployment**: GitHub Pages (frontend) + AWS EC2 (backend)
 
-## Quick Start
+## Quick Start (Development)
 
 ### Prerequisites
+- Node.js 18+
+- .NET 8 SDK
+- Git
 
-- Docker and Docker Compose
-- .NET 8 SDK (for development)
-- Node.js 18+ (for development)
+### Run Locally
 
-### Production Deployment (Docker)
-
-1. **Build and run the backend:**
+1. **Clone the repository**
    ```bash
-   cd backend
-   docker build -t wedding-api .
-   docker run -d -p 5000:5000 -v $(pwd)/data:/app/data --name wedding-api wedding-api
+   git clone https://github.com/YOUR_USERNAME/wedding-gift-list.git
+   cd wedding-gift-list
    ```
 
-2. **Build and run the frontend:**
-   ```bash
-   cd frontend
-   docker build -t wedding-frontend .
-   docker run -d -p 3000:80 --name wedding-frontend wedding-frontend
-   ```
-
-3. **Access the application:**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:5000
-   - API Documentation: http://localhost:5000/swagger
-
-### Development Setup
-
-1. **Backend Development:**
+2. **Start the backend**
    ```bash
    cd backend
-   dotnet restore
    dotnet run
    ```
-   The API will be available at `https://localhost:5001` and `http://localhost:5000`
+   Backend will run on http://localhost:5139
 
-2. **Frontend Development:**
+3. **Start the frontend** (in a new terminal)
    ```bash
    cd frontend
    npm install
    npm start
    ```
-   The React app will be available at `http://localhost:3000`
+   Frontend will run on http://localhost:3000
+
+## Production Deployment
+
+We've configured a simple, cost-effective, **tag-based deployment** strategy:
+
+- **Frontend**: GitHub Pages (Free)
+- **Backend**: AWS EC2 Free Tier (Free for 12 months)
+- **CI/CD**: GitHub Actions (Free) - triggered by version tags
+- **Deployment**: Use `./deploy.sh` script for easy versioned releases
+
+**👉 [Complete Deployment Guide](DEPLOYMENT.md)**
+
+### Quick Deploy
+```bash
+chmod +x deploy.sh
+./deploy.sh  # Interactive deployment with version tagging
+```
+
+## Project Structure
+
+```
+wedding-gift-list/
+├── frontend/                 # React TypeScript frontend
+│   ├── src/
+│   │   ├── components/      # React components
+│   │   ├── services/        # API service layer
+│   │   ├── types/          # TypeScript type definitions
+│   │   └── App.tsx         # Main application component
+│   └── package.json
+├── backend/                 # .NET 8 Web API
+│   ├── Controllers/        # API controllers
+│   ├── Models/            # Data models and DTOs
+│   ├── Services/          # Business logic services
+│   ├── Data/              # Entity Framework context
+│   ├── deploy-scripts/    # AWS deployment scripts
+│   └── Program.cs         # Application entry point
+├── .github/workflows/     # GitHub Actions CI/CD
+└── DEPLOYMENT.md         # Detailed deployment guide
+```
 
 ## API Endpoints
 
-- `GET /api/gifts` - Get all gifts with their status
-- `POST /api/gifts/{id}/take` - Take a gift (requires guest name)
-- `POST /api/gifts/{id}/release` - Release a taken gift
+- `GET /api/gifts` - Get all gifts
+- `POST /api/gifts/{id}/take` - Reserve a gift
+- `POST /api/gifts/{id}/release` - Release a reserved gift
 
-## Database
+## Development Scripts
 
-The application uses SQLite for simplicity. The database file is stored in `/app/data/wedding_gifts.db` inside the container, which is mapped to a volume for persistence.
-
-### Sample Data
-
-The application comes with 6 pre-seeded gifts:
-- Coffee Machine
-- Kitchen Knife Set
-- Silk Bed Sheets
-- Wine Glasses Set
-- Cast Iron Cookware
-- Photo Album
-
-## Concurrency Control
-
-The application implements optimistic concurrency control using Entity Framework's `[Timestamp]` attribute. This prevents race conditions where two guests might try to take the same gift simultaneously.
-
-## Architecture
-
-```
-┌─────────────────┐    HTTP/JSON    ┌──────────────────┐
-│  React Frontend │ ◄──────────────► │ .NET Core Web API│
-│  (TailwindCSS)  │                 │  (Controllers)   │
-└─────────────────┘                 └──────────────────┘
-                                             │
-                                             ▼
-                                    ┌──────────────────┐
-                                    │ Entity Framework │
-                                    │     (SQLite)     │
-                                    └──────────────────┘
+### Frontend
+```bash
+cd frontend
+npm start          # Start development server
+npm run build      # Build for production
+npm test           # Run tests
 ```
 
-## Deployment Notes
-
-- **Data Persistence**: Make sure to mount a volume for the SQLite database in production
-- **HTTPS**: The backend is configured for HTTPS in production
-- **CORS**: Configured to allow frontend access to the API
-- **Error Handling**: Comprehensive error handling with user-friendly messages
-- **Validation**: Input validation on both client and server sides
+### Backend
+```bash
+cd backend
+dotnet run         # Start development server
+dotnet build       # Build the application
+dotnet test        # Run tests (when added)
+```
 
 ## Customization
 
-- **Images**: Replace the Unsplash image URLs in `backend/Data/WeddingGiftListContext.cs`
-- **Colors**: Modify the color palette in `frontend/tailwind.config.js`
-- **Gifts**: Update the seed data in the DbContext to match your desired gifts
+### Adding Gifts
+
+Gifts are automatically seeded in the database. To modify the gift list, edit the `WeddingGiftListContext.cs` file in the Data folder.
+
+### Styling
+
+The frontend uses Tailwind CSS. You can customize colors, fonts, and styling by modifying the Tailwind configuration and component files.
+
+### Language
+
+The app is currently in Brazilian Portuguese. To change the language, update the text strings in the React components.
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Support
+
+If you encounter any issues:
+
+1. Check the [Deployment Guide](DEPLOYMENT.md)
+2. Review GitHub Actions logs
+3. Check EC2 instance logs (if using AWS deployment)
+4. Open an issue with detailed error information
 
 ## License
 
-This project is created for personal use. Feel free to adapt it for your own wedding!
+This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-Made with ❤️ for a special wedding day
+**Made with ❤️ for your special day**
+
+Happy coding and congratulations on your wedding! 🎉

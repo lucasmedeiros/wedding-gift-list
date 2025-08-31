@@ -16,9 +16,23 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        if (builder.Environment.IsProduction())
+        {
+            // In production, restrict to GitHub Pages URL
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() 
+                               ?? new[] { "https://lucasmedeiros.github.io" };
+            
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        }
+        else
+        {
+            // In development, allow any origin
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        }
     });
 });
 
