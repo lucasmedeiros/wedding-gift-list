@@ -10,4 +10,5 @@ public interface IGiftsService
     Task<GiftResponse> CreateAsync(CreateGiftRequest request, CancellationToken cancellationToken);
     Task<GiftResponse?> TakeAsync(int id, TakeGiftRequest request, CancellationToken cancellationToken);
     Task<GiftResponse?> ReleaseAsync(int id, CancellationToken cancellationToken);
+    Task<bool> DeleteAsync(int id, CancellationToken cancellationToken);
 }

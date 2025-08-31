@@ -177,10 +177,32 @@ public class GiftsService(WeddingGiftListContext context, IMemoryCache memoryCac
             Version = gift.Version
         };
     }
+
+    public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
+    {
+        var gift = await FindInternalAsync(id, cancellationToken);
+        if (gift == null)
+        {
+            return false;
+        }
+
+        context.Gifts.Remove(gift);
+        await context.SaveChangesAsync(cancellationToken);
+        DestroyGiftCache(gift.Id);
+        DestroyGiftsCache();
+
+        return true;
+    }
     
     private void DestroyGiftsCache()
     {
         var cacheKey = BuildGiftsCacheKey();
+        memoryCache.Remove(cacheKey);
+    }
+
+    private void DestroyGiftCache(int id)
+    {
+        var cacheKey = BuildGiftByIdCacheKey(id);
         memoryCache.Remove(cacheKey);
     }
 

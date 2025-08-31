@@ -24,7 +24,28 @@ builder.Services.AddCors(options =>
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Wedding Gift List API",
+        Version = "v1",
+        Description = "An API for managing wedding gift lists, allowing guests to view, take, and release gifts.",
+        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        {
+            Name = "Wedding Gift List Support",
+            Email = "support@weddinggiftlist.com"
+        }
+    });
+
+    // Enable XML comments for detailed documentation
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
+});
 
 // Add memory cache
 builder.Services.AddMemoryCache();

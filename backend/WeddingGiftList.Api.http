@@ -1,6 +1,70 @@
-@WeddingGiftList.Api_HostAddress = http://localhost:5139
+### Wedding Gift List API Test File
+### This file contains sample HTTP requests for testing all endpoints
 
-GET {{WeddingGiftList.Api_HostAddress}}/weatherforecast/
+@baseUrl = https://localhost:7293
+# @baseUrl = http://localhost:5139
+
+### Get all gifts
+GET {{baseUrl}}/api/gifts
 Accept: application/json
 
-###
+### Create a new gift
+POST {{baseUrl}}/api/gifts
+Content-Type: application/json
+
+{
+  "name": "Premium Coffee Maker",
+  "description": "A high-end automatic coffee maker with built-in grinder and milk frother"
+}
+
+### Create another gift
+POST {{baseUrl}}/api/gifts
+Content-Type: application/json
+
+{
+  "name": "Kitchen Knife Set",
+  "description": "Professional chef knife set with wooden block"
+}
+
+### Take a gift (replace {id} with actual gift ID)
+POST {{baseUrl}}/api/gifts/1/take
+Content-Type: application/json
+
+{
+  "guestName": "John Smith",
+  "version": 1
+}
+
+### Release a gift (replace {id} with actual gift ID)
+POST {{baseUrl}}/api/gifts/1/release
+Content-Type: application/json
+
+### Delete a gift (replace {id} with actual gift ID)
+DELETE {{baseUrl}}/api/gifts/1
+Accept: application/json
+
+### Test error scenarios
+
+### Take a non-existent gift
+POST {{baseUrl}}/api/gifts/999/take
+Content-Type: application/json
+
+{
+  "guestName": "Jane Doe"
+}
+
+### Take an already taken gift
+POST {{baseUrl}}/api/gifts/1/take
+Content-Type: application/json
+
+{
+  "guestName": "Another Guest"
+}
+
+### Release a gift that's not taken
+POST {{baseUrl}}/api/gifts/2/release
+Content-Type: application/json
+
+### Delete a non-existent gift
+DELETE {{baseUrl}}/api/gifts/999
+Accept: application/json
