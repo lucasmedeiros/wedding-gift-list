@@ -7,13 +7,16 @@ interface GiftCardProps {
   onRelease: (gift: Gift) => void;
 }
 
-export const GiftCard: React.FC<GiftCardProps> = ({ gift, onTake, onRelease }) => {
+export const GiftCard: React.FC<GiftCardProps> = ({ gift, onTake }) => {
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
     return new Date(dateString).toLocaleDateString('pt-BR', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
     });
   };
 

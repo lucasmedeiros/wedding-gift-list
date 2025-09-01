@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WeddingGiftList.Api.Models;
 
 namespace WeddingGiftList.Api.Data;
@@ -10,6 +11,22 @@ public class WeddingGiftListContext(DbContextOptions<WeddingGiftListContext> opt
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            foreach (var property in entityType.GetProperties())
+            {
+                if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?))
+                {
+                    property.SetValueConverter(
+                        new ValueConverter<DateTime, DateTime>(
+                            v => v, // Store as-is
+                            v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // Read back as UTC
+                        )
+                    );
+                }
+            }
+        }
 
         // Configure Gift entity
         modelBuilder.Entity<Gift>(entity =>
