@@ -30,3 +30,13 @@ docker ps # ver status do container
 docker logs wedding-gifts # ver logs da aplicação
 curl https://api.projectslucas.dev/ # testar acesso à API
 ```
+
+```shell
+curl -X POST "https://api.projectslucas.dev/api/Gifts" \
+  -H "Content-Type: application/json" \
+  -d '{ "name": "name", "description": "description" }'
+
+curl -X POST "https://api.projectslucas.dev/api/Gifts/id/release"
+
+curl -X GET "https://api.projectslucas.dev/api/Gifts"
+```

@@ -105,7 +105,7 @@ public class GiftsController(ILogger<GiftsController> logger, IGiftsService  gif
         }
         catch (DbUpdateConcurrencyException)
         {
-            return Conflict(new { message = "The gift was modified by another user. Please refresh and try again." });
+            return Conflict(new { message = "O presente foi selecionado por outro usuário. Atualize e tente novamente!" });
         }
         catch (InvalidOperationException ex)
         {
@@ -155,7 +155,7 @@ public class GiftsController(ILogger<GiftsController> logger, IGiftsService  gif
         }
         catch (DbUpdateConcurrencyException)
         {
-            return Conflict(new { message = "The gift was modified by another user. Please refresh and try again." });
+            return Conflict(new { message = "O presente foi selecionado por outro usuário. Atualize e tente novamente!" });
         }
         catch (InvalidOperationException ex)
         {
@@ -163,8 +163,8 @@ public class GiftsController(ILogger<GiftsController> logger, IGiftsService  gif
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error taking gift {GiftId}", id);
-            return StatusCode(500, "An error occurred while taking the gift");
+            logger.LogError(ex, "Erro ao selecionar presente {GiftId}", id);
+            return StatusCode(500, "Erro ao selecionar presente. Atualize e tente novamente!");
         }
     }
 
@@ -199,7 +199,7 @@ public class GiftsController(ILogger<GiftsController> logger, IGiftsService  gif
         }
         catch (DbUpdateConcurrencyException)
         {
-            return Conflict(new { message = "The gift was modified by another user. Please refresh and try again." });
+            return Conflict(new { message = "O presente foi selecionado por outro usuário. Atualize e tente novamente!" });
         }
         catch (InvalidOperationException ex)
         {

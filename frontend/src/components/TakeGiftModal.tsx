@@ -65,7 +65,7 @@ export const TakeGiftModal: React.FC<TakeGiftModalProps> = ({
                 id="guestName"
                 value={guestName}
                 onChange={(e) => setGuestName(e.target.value)}
-                placeholder="Digite seu nome completo"
+                placeholder="Digite seu nome e sobrenome"
                 className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                 required
                 disabled={isLoading}
